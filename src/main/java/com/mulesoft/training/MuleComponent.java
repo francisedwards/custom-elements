@@ -9,6 +9,12 @@ import java.util.HashMap;
 
 public class MuleComponent {
 
+	int count;
+
+	public MuleComponent() {
+		count = 0;
+	}
+
 	public Map<String, String> processMap(Map<String, String> input) {
 		// processMap implementation
 		input.put("processed by", "processMap");
@@ -33,10 +39,12 @@ public class MuleComponent {
 
 	public Map<String, String> processAll(@Payload Object input, @InboundHeaders("http.method") String method) {
 		// processString implementation
+		count++;
 		Map<String, String> output = new HashMap<String, String>();
 		output.put("message", input.toString());
 		output.put("processed by", "processAll");
 		output.put("method", method);
+		output.put("current count", String.valueOf(count));
 		return output;
 	}
 }
