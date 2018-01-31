@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:json="http://www.mulesoft.org/schema/mule/json"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://www.mulesoft.org/schema/mule/http"
@@ -10,7 +11,8 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
-http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
 	<http:listener-config name="http8081" host="localhost"
 		port="8081" doc:name="HTTP Listener Configuration" />
@@ -18,6 +20,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 	<flow name="main">
 		<http:listener config-ref="http8081" path="/component"
 			doc:name="HTTP" />
+		<message-filter onUnaccepted="filteredMessage"
+			doc:name="Message">
+			<payload-type-filter expectedType="java.util.List" />
+		</message-filter>
 		<choice doc:name="Choice">
 			<when
 				expression="#[message.inboundProperties.'http.query.params'.type == 'map']">
@@ -41,6 +47,10 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 				<logger message="Could not locate requested path" doc:name="Logger" />
 			</otherwise>
 		</choice>
+	</flow>
+	<flow name="filteredMessage">
+		<logger message="Filtered Message #[message.id]" level="INFO"
+			doc:name="Logger" />
 	</flow>
 
 	<flow name="componentExample">
